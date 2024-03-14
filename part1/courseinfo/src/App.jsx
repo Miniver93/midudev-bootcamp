@@ -1,29 +1,32 @@
+/* eslint-disable react/prop-types */
 
 
 /*
 const Header=({course})=> <h1>{course}</h1>
 */
 const Header=({course})=>{
-  return <h1>{course}</h1>
+  return <h1>{course.name}</h1>
 }
-const Content=({parts})=>{
+const Content=({course})=>{
+
   return (
     <>  
-    <p>{parts[0].name} {parts[0].exercises}</p>
-    <p>{parts[1].name} {parts[1].exercises}</p>
-    <p>{parts[2].name} {parts[2].exercises}</p>
+    <p>{course.parts[0].name} {course.parts[0].exercises}</p>
+    <p>{course.parts[1].name} {course.parts[1].exercises}</p>
+    <p>{course.parts[2].name} {course.parts[2].exercises}</p>
     </>
 
   )
 }
-const Total=({parts})=>{
-  const resultado=parts[0].exercises+parts[1].exercises+parts[2].exercises
+const Total=({course})=>{
+  const resultado=course.parts[0].exercises+course.parts[1].exercises+course.parts[2].exercises
   return <p>Number of exercises {resultado}</p>
 }
 
 const App = () => {
-  const course = 'Half Stack application development'
-  const parts = [
+  const course = {
+  name: 'Half Stack application development',
+  parts: [
   {
     name: 'Fundamentals of React',
     exercises: 10
@@ -37,12 +40,12 @@ const App = () => {
     exercises: 14
   }
   ]
+}
   return (
     <div>
       <Header course={course}/>
-      <Content parts={parts}/>
-
-      <Total parts={parts}/>
+      <Content course={course}/>
+      <Total course={course}/>
     </div>
   )
 }
