@@ -4,18 +4,29 @@ import { useState } from 'react'
 let array_votos=[]
 
 
-const Statistics = ({good,neutral,bad,all,average,positive})=>{
+const Statistics = (props)=>{
+  console.log(props);
+  if(array_votos==0){
+    return( 
+    <>
+    <h1>statistics</h1>
+    <p>No feedback given</p>
+    </>
+    )
+  }else{
   return(
+    
     <>
   <h1>statistics</h1>
-  <p>good {good}</p>
-  <p>neutral {neutral}</p>
-  <p>bad {bad}</p>
-  <p>all {all}</p>
-  <p>average {average}</p>
-  <p>positive {positive}%</p>
+  <p>good {props.good}</p>
+  <p>neutral {props.neutral}</p>
+  <p>bad {props.bad}</p>
+  <p>all {props.all}</p>
+  <p>average {props.average}</p>
+  <p>positive {props.positive}%</p>
   </>
   )
+  }
 }
 
 const App = () => {
@@ -25,7 +36,7 @@ const App = () => {
   const [bad, setBad] = useState(0)
   const [all, setAll] = useState(0)
   const [average, setAverage] = useState(0)
-  const [positive, setPositive] = useState()
+  const [positive, setPositive] = useState(0)
  
 
   const handleOnClick=(e)=> {
