@@ -1,5 +1,23 @@
+/* eslint-disable react/prop-types */
 import { useState } from 'react'
+
 let array_votos=[]
+
+
+const Statistics = ({good,neutral,bad,all,average,positive})=>{
+  return(
+    <>
+  <h1>statistics</h1>
+  <p>good {good}</p>
+  <p>neutral {neutral}</p>
+  <p>bad {bad}</p>
+  <p>all {all}</p>
+  <p>average {average}</p>
+  <p>positive {positive}%</p>
+  </>
+  )
+}
+
 const App = () => {
   // guarda los clics de cada botón en su propio estado
   const [good, setGood] = useState(0)
@@ -43,13 +61,8 @@ const App = () => {
       <button onClick={handleOnClick}>good</button>
       <button onClick={handleOnClick}>neutral</button>
       <button onClick={handleOnClick}>bad</button>
-      <h1>statistics</h1>
-      <p>good {good}</p>
-      <p>neutral {neutral}</p>
-      <p>bad {bad}</p>
-      <p>all {all}</p>
-      <p>average {average}</p>
-      <p>positive {positive}%</p>
+      <Statistics good={good} neutral={neutral} bad={bad} all={all} average={average} positive={positive}/>
+
 
     </div>
   )
