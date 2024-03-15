@@ -27,10 +27,15 @@ const App = () => {
   const [selected, setSelected] = useState(0)
   //Creo un nuevo estado donde guardo la puntuación en un array
   const [vote, setVote] = useState(points)
-  
 
+  //Guardo el máximo valor del array vote en max_vote
+  const max_vote=vote.reduce((acumulator,currentValue)=>Math.max(acumulator,currentValue))
+
+  //Tengo que guardar la posición del numero mayor de mi array de votos, para luego añadirselo a mis anécdotas
+  const max_anecdote=vote.findIndex((element)=>element==max_vote)
   return (
     <div>
+      <h1>Anecdote of the day</h1>
       {anecdotes[selected]}
       <p>has {vote[selected]} votes</p>
 
@@ -39,9 +44,11 @@ const App = () => {
         newVotes[selected] += 1; /* Aumento en 1 el valor de este array en la posición que se guia por la anecdota seleccionada en estos momentos*/
         setVote(newVotes); /* A mi estado le doy el nuevo valor, que será el que tiene mi array de votos ahora mismo */
       }}>vote</button>
-      {console.log(vote)}
       {/* <button onClick={()=>setSelected(Math.floor(Math.random()*anecdotes.length))}>next anecdote</button> */}
       <BtnAnecdote value={setSelected} anecdote={anecdotes} text="next anecdote"/>
+      <h1>Anecdote with most votes</h1>
+      {anecdotes[max_anecdote]}
+      <p>has {max_vote} votes</p>
     </div>
   )
 }
