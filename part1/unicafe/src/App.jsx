@@ -9,7 +9,16 @@ const BtnStatistics=({text,onClick})=>{
 const StatisticLine =({text,value})=>{
   return(
     <>
-    <p>{text} {value}</p>
+    {/* <p>{text} {value}</p> */}
+    <table>
+    <tbody>
+      <tr>
+      <td>{text}</td>
+      <td>{value}</td>
+      </tr>
+    </tbody>
+    </table>
+
     </>
   )
 }
