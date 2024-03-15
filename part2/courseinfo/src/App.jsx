@@ -66,11 +66,23 @@ const App = () => {
         name: 'State of a component',
         exercises: 14,
         id: 3
+      },
+      {
+        name: 'Redux',
+        exercises: 11,
+        id: 4
       }
     ]
   }
 
-  return <Course course={course} />
+  //En el array parts, sumo todos los ejercicios y los guardo en total_exercises
+  const total_exercises=course.parts.reduce((total,exercise)=>total+exercise.exercises,0)
+
+  return (
+  <><Course course={course} />
+  <p style={{fontWeight:'bold'}}>total of {total_exercises} exercises</p>
+  </>
+  )
 }
 
 export default App
