@@ -19,11 +19,27 @@ const App = () => {
     'The only way to go fast, is to go well.'
   ]
 
+  const points=[]
+  anecdotes.forEach(element => {
+    element=0
+    points.push(element)
+  });
   const [selected, setSelected] = useState(0)
+  //Creo un nuevo estado donde guardo la puntuación en un array
+  const [vote, setVote] = useState(points)
+  
 
   return (
     <div>
       {anecdotes[selected]}
+      <p>has {vote[selected]} votes</p>
+
+      <button onClick={()=>{
+        const newVotes=[...vote]; /* Guardo en una constante una copia del array de el estado vote */
+        newVotes[selected] += 1; /* Aumento en 1 el valor de este array en la posición que se guia por la anecdota seleccionada en estos momentos*/
+        setVote(newVotes); /* A mi estado le doy el nuevo valor, que será el que tiene mi array de votos ahora mismo */
+      }}>vote</button>
+      {console.log(vote)}
       {/* <button onClick={()=>setSelected(Math.floor(Math.random()*anecdotes.length))}>next anecdote</button> */}
       <BtnAnecdote value={setSelected} anecdote={anecdotes} text="next anecdote"/>
     </div>
