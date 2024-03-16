@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import { Filter } from './components/Filter'
+import { PersonForm } from './components/PersonForm'
+import { Persons } from './components/Persons'
 
 const App = () => {
   //Un estado con el estado inicial de un objeto con el nombre de personas
@@ -15,6 +18,7 @@ const App = () => {
   const addPerson=(e)=>{
     e.preventDefault();
     const personObject={
+      id: persons.length + 1,
       name: newName,
       number: newNumber
     }
@@ -49,28 +53,11 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-      <div>
-        filter shown with <input type="text" value={filterList} onChange={handleFilterList}/>
-      </div>
+      <Filter value={filterList} onChange={handleFilterList}/>
       <h2>add a new</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input type="text" value={newName} onChange={handleNameInputChange}/>
-        </div>
-        <div>
-          number: <input type='tel' value={newNumber} onChange={handleNumberInputChange}/>
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm onSubmit={addPerson} newName={newName} handleName={handleNameInputChange} newNumber={newNumber} handleNumber={handleNumberInputChange}/>
       <h2>Numbers</h2>
-      <ul>
-        {/* Aquí estoy filtrando mi array pero que solo renderize a las personas que contengan el filtro, que sería el texto que le indico arriba. Si contiene tal, renderizate,  */}
-        {persons.filter(person=>person.name.toLowerCase().includes(filterList.toLowerCase()) || person.number.includes(filterList)
-          
-        ).map((person)=>{return <li key={persons.length+=1}>{person.name} {person.number}</li>})}
-      </ul>
+      <Persons persons={persons} filterList={filterList}/>
     </div>
   )
 }
