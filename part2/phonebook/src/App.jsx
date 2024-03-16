@@ -12,7 +12,14 @@ const App = () => {
     const personObject={
       name: newName
     }
-    setPersons(persons.concat(personObject))
+    //Verifico si mi agenda no contiene el nombre que le quiero añadir
+    if (!persons.some((element)=>element.name===personObject.name)) {
+      setPersons(persons.concat(personObject))
+    }else{
+      alert(`${newName} is already added to phonebook`)
+    }
+    console.log(personObject);
+
   }
 
   const handleNameInputChange=(e)=>{
