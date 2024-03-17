@@ -1,16 +1,38 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import Note from './components/Note'
+import axios from 'axios'
 
-const App = (props) => {
+const App = () => {
   //Inicializo el estado 'notes' con el valor inicial proporcionado el las props.notes, que es el objeto notes del main.jsx
-  const [notes, setNotes] = useState(props.notes)
-  const [newNote,setNewNote]=useState("A new note")
+  const [notes, setNotes] = useState([])
+  const [newNote,setNewNote]=useState("")
   const [showAll,setShowAll]=useState(true)
+
+  
+
+    // //Los effectos son para que se ejecuten después del renderizado
+    // useEffect(()=>{
+    //   //Para que no vuelva a hacer una petición al servidor cuando se vuelva a renderizar la app, tenemos que pasarle una condición con un stado
+    //   if(!loading){
+    //     fetch("http://localhost:3001/notes").then(response=>response.json()).then(json=>{
+    //     const data=json
+    //     console.log(data);
+    //     setNotes(notes.concat(data))
+    //   }); 
+    //   }
+    //   setLoading(true)
+    // },[])//Para que no me haga un loop infinito, tengo que pasarle como parámetro a mi useEffect unas dependencias, que haga que se vuelva a ejecutar el useEffect según los valores que le pase, si lo dejo vacio solo se ejecutará una vez al renderizarse la app, si le paso como parámetro newNote, cada vez que entre un nuevo valor en el input se ejecutará de nuevo
+ 
+    useEffect(()=>{
+      axios.get("http://localhost:3001/notes").then(response => {
+        setNotes(response.data);
+      });
+    },[setNotes])
 
   const addNote = (event) => {
     event.preventDefault()
-    console.log('button clicked', event.target)
     //Creación del objeto nueva nota
     const noteObject={
       id: notes.length+1, /* Le decimos que la id sea la longitud de todas nuestras notas +1 */
@@ -22,7 +44,6 @@ const App = (props) => {
   }
 
   const handleNoteChange=(event)=>{
-    console.log(event.target.value)
     setNewNote(event.target.value)
   }
 
