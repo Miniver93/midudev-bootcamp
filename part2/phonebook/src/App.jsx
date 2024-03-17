@@ -7,6 +7,7 @@ import { useEffect } from 'react'
 
 import { getAllPhoneBook } from './services/phonebook/getAllPhoneBook'
 import { setNumberPhoneBook } from './services/phonebook/setNumberPhoneBook'
+import { deleteNumber } from './services/phonebook/deleteNumber'
 
 const App = () => {
   //Un estado con el estado inicial de un objeto con el nombre de personas
@@ -14,10 +15,12 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber]=useState('')
   const [filterList, setFilterList]=useState('')
+  const [numberDeleted, setNumberDeleted]=useState(true)
 
   useEffect(()=>{
     getAllPhoneBook().then(data=>setPersons(data)).catch(error=>console.error("Cannot load data",error));
-  },[])
+    setNumberDeleted(false)
+  },[numberDeleted]) //Cuando numberDeleted sea true, se volverá a cargar los números de teléfono
 
   
   const handleSubmit=(e)=>{
@@ -36,6 +39,10 @@ const App = () => {
       alert(`${newName} is already added to phonebook`)
     }
 
+  }
+  const handleDeleteNumber=(e)=>{
+    deleteNumber(e)
+    setNumberDeleted(true)
   }
 
   const handleNameInputChange=(e)=>{
@@ -63,7 +70,7 @@ const App = () => {
       <h2>add a new</h2>
       <PersonForm onSubmit={handleSubmit} newName={newName} handleName={handleNameInputChange} newNumber={newNumber} handleNumber={handleNumberInputChange}/>
       <h2>Numbers</h2>
-      <Persons persons={persons} filterList={filterList}/>
+      <Persons persons={persons} filterList={filterList} deleteNumber={handleDeleteNumber}/>
     </div>
   )
 }
