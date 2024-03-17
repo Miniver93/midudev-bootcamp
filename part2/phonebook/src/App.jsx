@@ -3,7 +3,10 @@ import { Filter } from './components/Filter'
 import { PersonForm } from './components/PersonForm'
 import { Persons } from './components/Persons'
 import { useEffect } from 'react'
-import axios from 'axios'
+
+
+import { getAllPhoneBook } from './services/phonebook/getAllPhoneBook'
+import { setNumberPhoneBook } from './services/phonebook/setNumberPhoneBook'
 
 const App = () => {
   //Un estado con el estado inicial de un objeto con el nombre de personas
@@ -13,23 +16,25 @@ const App = () => {
   const [filterList, setFilterList]=useState('')
 
   useEffect(()=>{
-    axios.get("http://localhost:3001/persons").then(response=>setPersons(response.data))
+    getAllPhoneBook().then(data=>setPersons(data)).catch(error=>console.error("Cannot load data",error));
   },[])
 
-  const addPerson=(e)=>{
+  
+  const handleSubmit=(e)=>{
     e.preventDefault();
+    
     const personObject={
-      id: persons.length + 1,
       name: newName,
-      number: newNumber
+      number: newNumber, /* Si la longitud del array es mayor que 0 entonces cojo el la id que tenga mayor en mi array y la incremento en 1 */
+      id: persons.length > 0 ? Math.max(...persons.map(person=>person.id)) + 1: 0 
     }
     //Verifico si mi agenda no contiene el nombre que le quiero añadir
     if (!persons.some((person)=>person.name===personObject.name)) {
-      setPersons(persons.concat(personObject))
+      setPersons(prePerson=>prePerson.concat(personObject))
+      setNumberPhoneBook(personObject).catch(error=>console.error("Cannot load data",error))
     }else{
       alert(`${newName} is already added to phonebook`)
     }
-    console.table(personObject)
 
   }
 
@@ -56,7 +61,7 @@ const App = () => {
       <h1>Phonebook</h1>
       <Filter value={filterList} onChange={handleFilterList}/>
       <h2>add a new</h2>
-      <PersonForm onSubmit={addPerson} newName={newName} handleName={handleNameInputChange} newNumber={newNumber} handleNumber={handleNumberInputChange}/>
+      <PersonForm onSubmit={handleSubmit} newName={newName} handleName={handleNameInputChange} newNumber={newNumber} handleNumber={handleNumberInputChange}/>
       <h2>Numbers</h2>
       <Persons persons={persons} filterList={filterList}/>
     </div>
