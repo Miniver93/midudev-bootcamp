@@ -1,5 +1,5 @@
 import axios from "axios";
 
 export const deleteNumber=(id)=>{
-    axios.delete(`http://localhost:3001/persons/${id}`); 
+    return axios.delete(`http://localhost:3001/persons/${id}`); 
 }

@@ -8,6 +8,7 @@ import { useEffect } from 'react'
 import { getAllPhoneBook } from './services/phonebook/getAllPhoneBook'
 import { setNumberPhoneBook } from './services/phonebook/setNumberPhoneBook'
 import { deleteNumber } from './services/phonebook/deleteNumber'
+import { changeNumber } from './services/phonebook/changeNumber'
 
 const App = () => {
   //Un estado con el estado inicial de un objeto con el nombre de personas
@@ -15,34 +16,50 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber]=useState('')
   const [filterList, setFilterList]=useState('')
-  const [numberDeleted, setNumberDeleted]=useState(true)
+ 
 
   useEffect(()=>{
     getAllPhoneBook().then(data=>setPersons(data)).catch(error=>console.error("Cannot load data",error));
-    setNumberDeleted(false)
-  },[numberDeleted]) //Cuando numberDeleted sea true, se volverá a cargar los números de teléfono
+    
+  },[]) //Cuando numberDeleted sea true, se volverá a cargar los números de teléfono
 
+  const updatePhoneBook = () => {
+    getAllPhoneBook()
+      .then(data => setPersons(data))
+      .catch(error => console.error("Cannot load data", error));
+  };
+
+  const id=(persons.length > 0 ? Math.max(...persons.map(person => Number(person.id))) + 1 : 0).toString();
+
+  const personObject={
+    name: newName,
+    number: newNumber, /* Si la longitud del array es mayor que 0 entonces cojo el la id que tenga mayor en mi array y la incremento en 1 */
+    id: id
+  }
   
   const handleSubmit=(e)=>{
     e.preventDefault();
     
-    const personObject={
-      name: newName,
-      number: newNumber, /* Si la longitud del array es mayor que 0 entonces cojo el la id que tenga mayor en mi array y la incremento en 1 */
-      id: persons.length > 0 ? Math.max(...persons.map(person=>person.id)) + 1: 0 
-    }
+
     //Verifico si mi agenda no contiene el nombre que le quiero añadir
     if (!persons.some((person)=>person.name===personObject.name)) {
       setPersons(prePerson=>prePerson.concat(personObject))
-      setNumberPhoneBook(personObject).catch(error=>console.error("Cannot load data",error))
+      setNumberPhoneBook(personObject).then(()=>updatePhoneBook()).catch(error=>console.error("Cannot load data",error))
     }else{
-      alert(`${newName} is already added to phonebook`)
+      if(confirm(`${newName} is already added to phonebook,replace the old number with a new one?`)){
+        //Tengo que recuperar la id del objeto que quiero sustituir
+        let id
+        persons.some((person)=>person.name===newName ? id=person.id : 0)
+        changeNumber(id,personObject).then(()=>updatePhoneBook())
+        
+      }
     }
 
   }
+
   const handleDeleteNumber=(e)=>{
-    deleteNumber(e)
-    setNumberDeleted(true)
+    deleteNumber(e).then(()=>updatePhoneBook())
+    
   }
 
   const handleNameInputChange=(e)=>{
