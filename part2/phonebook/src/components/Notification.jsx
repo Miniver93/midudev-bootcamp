@@ -1,10 +1,12 @@
 // eslint-disable-next-line react/prop-types
-export const Notification=({message})=>{
-    if(message===null){
+export const Notification=({messageInfo, messageError, messageType})=>{
+    if(messageInfo===null && messageError===null){
         return null
     }
-
+    if(messageType){
+        return <div style={{color: "rgb(0, 121, 0, 1)"}}  className="message_info">{messageInfo}</div>
+    }
     return(
-        <div className="info_message">{message}</div>
+        <div style={{color: "red"}} className="message_error">{messageError}</div>
     )
 }

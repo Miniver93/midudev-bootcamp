@@ -1,6 +1,5 @@
-.info_message{
+.message_error, .message_info{
     font-size: 20px;
-    color: rgb(0, 121, 0, 1);
     background-color: gray;
     border-radius: 5px;
     border-style: solid;

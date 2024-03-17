@@ -12,18 +12,19 @@ import { deleteNumber } from './services/phonebook/deleteNumber'
 import { changeNumber } from './services/phonebook/changeNumber'
 
 const App = () => {
-  //Un estado con el estado inicial de un objeto con el nombre de personas
-  const [persons, setPersons] = useState([]) 
-  const [newName, setNewName] = useState('')
-  const [newNumber, setNewNumber]=useState('')
-  const [filterList, setFilterList]=useState('')
-  const [message, setMessage]=useState(null)
- 
+  const [persons, setPersons] = useState([]); 
+  const [newName, setNewName] = useState('');
+  const [newNumber, setNewNumber] = useState('');
+  const [filterList, setFilterList] = useState('');
+  const [message, setMessage] = useState(null);
+  const [messageType, setMessageType] = useState(false);
+  const [messageTimer, setMessageTimer] = useState(null);
 
-  useEffect(()=>{
-    getAllPhoneBook().then(data=>setPersons(data)).catch(error=>console.error("Cannot load data",error));
-    
-  },[]) //Cuando numberDeleted sea true, se volverá a cargar los números de teléfono
+  useEffect(() => {
+    getAllPhoneBook()
+      .then(data => setPersons(data))
+      .catch(error => console.error("Cannot load data", error));
+  }, []);
 
   const updatePhoneBook = () => {
     getAllPhoneBook()
@@ -31,76 +32,85 @@ const App = () => {
       .catch(error => console.error("Cannot load data", error));
   };
 
-  const id=(persons.length > 0 ? Math.max(...persons.map(person => Number(person.id))) + 1 : 0).toString();
+  const id = (persons.length > 0 ? Math.max(...persons.map(person => Number(person.id))) + 1 : 0).toString();
 
-  const personObject={
-    name: newName,
-    number: newNumber, /* Si la longitud del array es mayor que 0 entonces cojo el la id que tenga mayor en mi array y la incremento en 1 */
-    id: id
-  }
-  
-  const handleSubmit=(e)=>{
+  const handleMessage = (message, messageType, duration) => {
+    setMessageType(messageType);
+    setMessage(message);
+    if (messageTimer) {
+      clearTimeout(messageTimer); // Cancelar el temporizador existente
+    }
+    setMessageTimer(setTimeout(() => {
+      setMessage(null);
+    }, duration));
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    
+    const personObject = {
+      name: newName,
+      number: newNumber,
+      id: id
+    };
 
-    //Verifico si mi agenda no contiene el nombre que le quiero añadir
-    if (!persons.some((person)=>person.name===personObject.name)) {
-      setPersons(prePerson=>prePerson.concat(personObject))
-      setNumberPhoneBook(personObject).then(()=>updatePhoneBook()).catch(error=>console.error("Cannot load data",error))
-      setMessage(`Added ${newName}`)
-      setTimeout(()=>{
-        setMessage(null)
-      },2000)
-      
-    }else{
-      if(confirm(`${newName} is already added to phonebook,replace the old number with a new one?`)){
-        //Tengo que recuperar la id del objeto que quiero sustituir
-        let id
-        persons.some((person)=>person.name===newName ? id=person.id : 0)
-        changeNumber(id,personObject).then(()=>updatePhoneBook())
-        setMessage(`${newName} modified`)
-        setTimeout(()=>{
-        setMessage(null)
-        },2000)
+    if (!persons.some(person => person.name === personObject.name)) {
+      setPersons(prevPersons => prevPersons.concat(personObject));
+      setNumberPhoneBook(personObject)
+        .then(() => {
+          updatePhoneBook();
+          handleMessage(`Added ${newName}`, true, 4000);
+        })
+        .catch(error => console.error("Cannot load data", error));
+    } else {
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        let id;
+        persons.some(person => person.name === newName ? id = person.id : 0);
+        changeNumber(id, personObject)
+          .then(() => {
+            updatePhoneBook();
+            handleMessage(`${newName} modified`, true, 4000);
+          })
+          .catch(error => console.error("Cannot load data", error));
       }
     }
+  };
 
-  }
+  const handleDeleteNumber = (id, name) => {
+    deleteNumber(id)
+      .then(() => {
+        updatePhoneBook();
+        handleMessage(`Information of ${name} has already been removed from server`, false, 4000);
+      })
+      .catch(error => console.error("Cannot load data", error));
+  };
 
-  const handleDeleteNumber=(e)=>{
-    deleteNumber(e).then(()=>updatePhoneBook())
-    
-  }
+  const handleNameInputChange = (e) => {
+    const input = e.target.value;
+    const lettersOnly = input.replace(/[^a-zA-Z\s]/g, '');
+    setNewName(lettersOnly);
+  };
 
-  const handleNameInputChange=(e)=>{
-    const input=e.target.value;
-    const lettersOnly=input.replace(/[^a-zA-Z\s]/g, '')
-    setNewName(lettersOnly)
-  }
+  const handleNumberInputChange = (e) => {
+    const input = e.target.value;
+    const numbersOnly = input.replace(/[^\d-]/g, '');
+    setNewNumber(numbersOnly);
+  };
 
-  const handleNumberInputChange=(e)=>{
-  const input = e.target.value; //Guardo el valor que escribo en input
-  const numbersOnly = input.replace(/[^\d-]/g, ''); // Remueve todos los caracteres que no sean dígitos
+  const handleFilterList = (e) => {
+    setFilterList(e.target.value);
+  };
 
-  setNewNumber(numbersOnly); //Cambio el valor de mi estado por mi input ya filtrado
-  }
-
-  const handleFilterList=(e)=>{
-    setFilterList(e.target.value)
-  }
-
-  
   return (
     <div>
       <h1>Phonebook</h1>
-      <Notification message={message}/>
+      <Notification messageInfo={message} messageError={message} messageType={messageType}/>
       <Filter value={filterList} onChange={handleFilterList}/>
       <h2>add a new</h2>
       <PersonForm onSubmit={handleSubmit} newName={newName} handleName={handleNameInputChange} newNumber={newNumber} handleNumber={handleNumberInputChange}/>
       <h2>Numbers</h2>
       <Persons persons={persons} filterList={filterList} deleteNumber={handleDeleteNumber}/>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
