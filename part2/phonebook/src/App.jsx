@@ -3,6 +3,7 @@ import { Filter } from './components/Filter'
 import { PersonForm } from './components/PersonForm'
 import { Persons } from './components/Persons'
 import { useEffect } from 'react'
+import { Notification } from './components/Notification'
 
 
 import { getAllPhoneBook } from './services/phonebook/getAllPhoneBook'
@@ -16,6 +17,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber]=useState('')
   const [filterList, setFilterList]=useState('')
+  const [message, setMessage]=useState(null)
  
 
   useEffect(()=>{
@@ -45,13 +47,21 @@ const App = () => {
     if (!persons.some((person)=>person.name===personObject.name)) {
       setPersons(prePerson=>prePerson.concat(personObject))
       setNumberPhoneBook(personObject).then(()=>updatePhoneBook()).catch(error=>console.error("Cannot load data",error))
+      setMessage(`Added ${newName}`)
+      setTimeout(()=>{
+        setMessage(null)
+      },2000)
+      
     }else{
       if(confirm(`${newName} is already added to phonebook,replace the old number with a new one?`)){
         //Tengo que recuperar la id del objeto que quiero sustituir
         let id
         persons.some((person)=>person.name===newName ? id=person.id : 0)
         changeNumber(id,personObject).then(()=>updatePhoneBook())
-        
+        setMessage(`${newName} modified`)
+        setTimeout(()=>{
+        setMessage(null)
+        },2000)
       }
     }
 
@@ -83,6 +93,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
+      <Notification message={message}/>
       <Filter value={filterList} onChange={handleFilterList}/>
       <h2>add a new</h2>
       <PersonForm onSubmit={handleSubmit} newName={newName} handleName={handleNameInputChange} newNumber={newNumber} handleNumber={handleNumberInputChange}/>
