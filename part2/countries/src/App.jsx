@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const ShowCountries = ({ countries, filterCountries }) => {
+const ShowCountries = ({ countries, filterCountries, onClickShow,selectedCountry, onClickHide}) => {
   const filteredCountries = countries.filter(country =>
     typeof country.name.common === 'string' &&
     country.name.common.toLowerCase().includes(filterCountries.toLowerCase()) 
@@ -13,10 +13,34 @@ const ShowCountries = ({ countries, filterCountries }) => {
   const exactMatchCountry= filteredCountries.find(country=>country.name.common.toLowerCase()===filterCountries.toLowerCase())
 
   const flags=filteredCountries.map(country=>(country.flags.png) ? country.flags.png : country.flags.svg)
-  console.log(flags);
+
+
+  
   return (
     <div>
-      {exactMatchCountry ? (
+      {
+        /* Ahora mismo selectedCountry es null */
+      selectedCountry ?(
+        <div key={selectedCountry.name.common}>
+            <h1>{selectedCountry.name.common}</h1>
+            <p>Capital: {selectedCountry.capital}</p>
+            <p>Area: {selectedCountry.area}</p>
+            <h2>Languages</h2>
+            <ul>
+              {/* Evaluo si está definido el lenguaje y si lo está hago un mapeo sobre el valor de mis languages */}
+              {selectedCountry.languages &&
+                Object.values(selectedCountry.languages).map(language => (
+                  <li key={language}>{language}</li>
+                ))}
+            </ul>
+            <img src={selectedCountry.flags.png || selectedCountry.flags.svg} alt={selectedCountry.flags.alt} />
+            <br />
+            <button onClick={()=>onClickHide(null)}>hide</button>
+          </div>
+      ):
+      
+      
+      exactMatchCountry ? (
         <div key={exactMatchCountry.name.common}>
           <h1>{exactMatchCountry.name.common}</h1>
           <p>Capital: {exactMatchCountry.capital}</p>
@@ -31,7 +55,16 @@ const ShowCountries = ({ countries, filterCountries }) => {
           <img src={flags} alt={exactMatchCountry.flags.alt} />
         </div>
       ) : 
-      
+
+      filterCountries.length > 1 ? (
+        <div>
+          <ul>
+            {filteredCountries.map(country => (
+              <li key={country.name.common}>{country.name.common}<button onClick={()=>onClickShow(country)}>show</button></li>
+            ))}
+          </ul>
+        </div>
+      ):
       
       filteredCountries.length === 1 ? (
         <div>
@@ -72,22 +105,36 @@ const ShowCountries = ({ countries, filterCountries }) => {
 function App() {
   const [countries, setCountries] = useState([]);
   const [nameCountry, setNameCountry] = useState('');
+  const [selectedCountry, setSelectedCountry]=useState(null)
 
   useEffect(() => {
     axios.get('https://restcountries.com/v3.1/all').then(response => {
       setCountries(response.data);
-    });
+    }).catch(error=>console.error("Cannot connect with API",error))
   }, []);
 
   const handleFilter = e => {
     setNameCountry(e.target.value);
+    setSelectedCountry(null) // Reiniciar el país seleccionado cuando se cambia el filtro
   };
 
+  const handleClickShow=(country)=>{
+    setSelectedCountry(country) //Al hacer click en el botón show, le he pasado desde el componente showCountries a su parámetro onClick el país seleccionado en tipo objeto y este lo almaceno en un stado, y luego este objeto lo retorno en el mismo componente showCountries llamando a su stado e iterándolo
+
+  }
+
+  const handleClickHide=(value)=>{
+    // Reiniciar el país seleccionado cuando se cambia el filtro
+    setSelectedCountry(value)
+  }
+
+ 
   return (
     <div>
       <label htmlFor="find_countries">Find countries</label>{' '}
       <input type="text" value={nameCountry} onChange={handleFilter} />
-      <ShowCountries countries={countries} filterCountries={nameCountry} />
+      <ShowCountries countries={countries} filterCountries={nameCountry} onClickShow={handleClickShow} selectedCountry={selectedCountry} onClickHide={handleClickHide}/>
+      
     </div>
   );
 }
