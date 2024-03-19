@@ -2,8 +2,10 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import 'dotenv'
+const api_key=import.meta.env.VITE_API_KEY
 
-const ShowCountries = ({ countries, filterCountries, onClickShow,selectedCountry, onClickHide}) => {
+const ShowCountries = ({ countries, filterCountries, onClickShow,selectedCountry, onClickHide, showWeather}) => {
   const filteredCountries = countries.filter(country =>
     typeof country.name.common === 'string' &&
     country.name.common.toLowerCase().includes(filterCountries.toLowerCase()) 
@@ -16,6 +18,9 @@ const ShowCountries = ({ countries, filterCountries, onClickShow,selectedCountry
 
 
   
+  
+  
+  
   return (
     <div>
       {
@@ -25,7 +30,7 @@ const ShowCountries = ({ countries, filterCountries, onClickShow,selectedCountry
             <h1>{selectedCountry.name.common}</h1>
             <p>Capital: {selectedCountry.capital}</p>
             <p>Area: {selectedCountry.area}</p>
-            <h2>Languages</h2>
+            <h3>Languages</h3>
             <ul>
               {/* Evaluo si está definido el lenguaje y si lo está hago un mapeo sobre el valor de mis languages */}
               {selectedCountry.languages &&
@@ -34,6 +39,7 @@ const ShowCountries = ({ countries, filterCountries, onClickShow,selectedCountry
                 ))}
             </ul>
             <img src={selectedCountry.flags.png || selectedCountry.flags.svg} alt={selectedCountry.flags.alt} />
+            <div>{showWeather(selectedCountry.name.common)}</div>
             <br />
             <button onClick={()=>onClickHide(null)}>hide</button>
           </div>
@@ -53,6 +59,7 @@ const ShowCountries = ({ countries, filterCountries, onClickShow,selectedCountry
               ))}
           </ul>
           <img src={flags} alt={exactMatchCountry.flags.alt} />
+          <div>{showWeather(exactMatchCountry.name.common)}</div>
         </div>
       ) : 
 
@@ -106,12 +113,38 @@ function App() {
   const [countries, setCountries] = useState([]);
   const [nameCountry, setNameCountry] = useState('');
   const [selectedCountry, setSelectedCountry]=useState(null)
+  const [weather, setWeather]=useState(null)
+  
 
   useEffect(() => {
     axios.get('https://restcountries.com/v3.1/all').then(response => {
       setCountries(response.data);
     }).catch(error=>console.error("Cannot connect with API",error))
   }, []);
+
+  const Wheather=(e)=>{
+    useEffect(()=>{
+      axios.get(`https://api.weatherapi.com/v1/current.json?key=${api_key}&q=${e}`).then(response=>{
+        setWeather(response.data)
+      }).catch(error=>console.error("Cannot connect with API",error));
+      
+    },[])
+    return(
+      weather ? (
+        <div>
+          <h2>Weather in {weather.location.name}</h2>
+          <p>Temperature: {weather.current.temp_c}ºc</p>
+          <img src={weather.current.condition.icon} alt="" />
+          <p>Wind {weather.current.wind_mph} m/s</p>
+        </div>
+        
+      ) : 0
+    )
+  }
+
+  
+
+  
 
   const handleFilter = e => {
     setNameCountry(e.target.value);
@@ -133,7 +166,7 @@ function App() {
     <div>
       <label htmlFor="find_countries">Find countries</label>{' '}
       <input type="text" value={nameCountry} onChange={handleFilter} />
-      <ShowCountries countries={countries} filterCountries={nameCountry} onClickShow={handleClickShow} selectedCountry={selectedCountry} onClickHide={handleClickHide}/>
+      <ShowCountries countries={countries} filterCountries={nameCountry} onClickShow={handleClickShow} selectedCountry={selectedCountry} onClickHide={handleClickHide} showWeather={Wheather}/>
       
     </div>
   );
