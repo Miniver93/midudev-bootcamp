@@ -2,46 +2,17 @@
 /* eslint-disable react/prop-types */
 import { useState,useEffect } from 'react'
 import Note from './components/Note'
-import axios from 'axios'
 import noteService from './services/notes'
 
-const Notification = ({ message }) => {
-  if (message === null) {
-    return null
-  }
 
-  return (
-    <div className='error'>
-      {message}
-    </div>
-  )
-}
 
 const App = () => {
   //Inicializo el estado 'notes' con el valor inicial proporcionado el las props.notes, que es el objeto notes del main.jsx
   const [notes, setNotes] = useState([])
   const [newNote,setNewNote]=useState("")
   const [showAll,setShowAll]=useState(true)
-  const [errorMessage, setErrorMessage] = useState('some error happened...')
+  const [updateNote, setUpdateNote]=useState([])
 
-  const toggleImportanceOf = id => {
-    const note = notes.find(n => n.id === id)
-    const changedNote = { ...note, important: !note.important }
-
-    noteService
-      .update(id, changedNote).then(returnedNote => {
-        setNotes(notes.map(note => note.id !== id ? note : returnedNote))
-      })
-      .catch(error => {
-        setErrorMessage(
-          `Note '${note.content}' was already removed from server`
-        )
-        setTimeout(() => {
-          setErrorMessage(null)
-        }, 5000)
-        setNotes(notes.filter(n => n.id !== id))
-      })
-  }
   
 
     // //Los effectos son para que se ejecuten después del renderizado
@@ -58,7 +29,7 @@ const App = () => {
     // },[])//Para que no me haga un loop infinito, tengo que pasarle como parámetro a mi useEffect unas dependencias, que haga que se vuelva a ejecutar el useEffect según los valores que le pase, si lo dejo vacio solo se ejecutará una vez al renderizarse la app, si le paso como parámetro newNote, cada vez que entre un nuevo valor en el input se ejecutará de nuevo
  
     useEffect(()=>{
-      axios.get("http://localhost:3001/notes").then(response => {
+      noteService.getAll().then(response => {
         setNotes(response.data);
       });
     },[setNotes])
@@ -66,11 +37,18 @@ const App = () => {
   const addNote = (event) => {
     event.preventDefault()
     //Creación del objeto nueva nota
+
+    const ids = notes.map(note => note.id)
+    console.log(ids)
+    const idMax = Math.max.apply(null, ids) //Con esto substituyo el objeto cada vez que creo una nueva nota, para que no se copie en memoria las ids
+
+
     const noteObject={
-      id: notes.length+1, /* Le decimos que la id sea la longitud de todas nuestras notas +1 */
+      id: idMax + 1, /* Le decimos que la id sea la longitud de todas nuestras notas +1 */
       content: newNote,
       important: Math.random()<0.5 //Su importancia será aleatoria
     }
+    noteService.create(noteObject)
     setNotes(notes.concat(noteObject)) /* Concatenamos nuestro nuevo ojbeto nota con nuestrs objetos notas */
     setNewNote('') //Para borrar lo que contiene el input después de guardar la nota
   }
@@ -85,7 +63,6 @@ const App = () => {
   return (
     <div>
       <h1>Notes</h1>
-      <Notification message={errorMessage} />
       <div>
         <button onClick={() => setShowAll(!showAll)}>
           show {showAll ? 'important' : 'all' }
