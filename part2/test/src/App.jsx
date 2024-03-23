@@ -2,6 +2,7 @@
 /* eslint-disable react/prop-types */
 import { useState,useEffect } from 'react'
 import Note from './components/Note'
+import ImportantNotes from './components/ImportantNotes'
 import noteService from './services/notes'
 
 
@@ -11,7 +12,8 @@ const App = () => {
   const [notes, setNotes] = useState([])
   const [newNote,setNewNote]=useState("")
   const [showAll,setShowAll]=useState(true)
-  const [updateNote, setUpdateNote]=useState([])
+  
+  
 
   
 
@@ -57,21 +59,43 @@ const App = () => {
     setNewNote(event.target.value)
   }
 
+ // Esta función se encarga de cambiar el estado de la propiedad 'important' de una nota específica.
+const handleToggleImportant = (note) => {
+  // Creamos un nuevo array de notas basado en el estado actual.
+  const toggledNotes = notes.map(n => {
+    // Si la ID de la nota actual coincide con la ID de la nota pasada como argumento, actualizamos su propiedad 'important'.
+    if (n.id === note.id) {
+      // Utilizamos la sintaxis de spread (...) para crear una copia de la nota actual y sobrescribimos el valor de 'important' con su inverso.
+      return { ...n, important: !n.important };
+    }
+    // Si la ID de la nota no coincide, mantenemos la nota sin cambios.
+    return n;
+  });
+
+  // Finalmente, actualizamos el estado de 'notes' con el nuevo array de notas modificado.
+  setNotes(toggledNotes);
+};
+
+
+
+  
   //Si showAll es true, noteToShow obtiene el valor de notes directamente, lo que significa que todas las notas se mostrarán. Si showAll es flase se ejecutará un filtro que me devuelve solo las notas que tengan como valor true
   const noteToShow= showAll ? notes : notes.filter(note=> note.important)
+
+  
 
   return (
     <div>
       <h1>Notes</h1>
       <div>
-        <button onClick={() => setShowAll(!showAll)}>
-          show {showAll ? 'important' : 'all' }
+        <button onClick={() => setShowAll(!showAll)}> {/* Cambio el valor de mi estado showAll, si es true lo camio a false y si es false lo cambio a true */}
+          show {showAll ? 'important' : 'all' } {/* El texto cambia según cual sea su valor ahora mismo */}
         </button>
-      </div>     
+      </div>   
       
       <ul>
         {notes.map(note => 
-          <Note key={note.id} note={note} />
+          <Note toggleImportance={handleToggleImportant} important={note.important} key={note.id} note={note} />
         )}
       </ul>
       <form onSubmit={addNote}>{/* Le estoy añadiendo el preventDefault al formulario y la nota*/}
@@ -81,13 +105,8 @@ const App = () => {
       <h2>Important notes</h2>
       <ul>
       {noteToShow.map(note=>
-          <Note key={note.id} note={note}/>)}
+          <ImportantNotes key={note.id} note={note}/>)}
       </ul>
-      <div>
-        <button onClick={() => setShowAll(!showAll)}> {/* Cambio el valor de mi estado showAll, si es true lo camio a false y si es false lo cambio a true */}
-          show {showAll ? 'important' : 'all' } {/* El texto cambia según cual sea su valor ahora mismo */}
-        </button>
-      </div>
     </div>
   )
 }
