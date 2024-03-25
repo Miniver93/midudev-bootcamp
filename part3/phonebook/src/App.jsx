@@ -52,6 +52,11 @@ const App = () => {
       id: id
     };
 
+    if(personObject.name.length < 3){
+      handleMessage(`Person validation failed: name: Path "name" (${newName}) is shorter than the minium allowed length (${newName.length}).`, false, 4000)
+      return //Para parar la ejecución del script
+    }
+
     if (!persons.some(person => person.name === personObject.name)) {
       setPersons(prevPersons => prevPersons.concat(personObject));
       setNumberPhoneBook(personObject)
