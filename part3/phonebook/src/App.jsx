@@ -52,11 +52,10 @@ const App = () => {
       id: id
     };
 
-    const phoneRegex = /^\d{2,3}-\d+$/;
     if(personObject.name.length < 3){
       handleMessage(`Person validation failed: name: Path "name" (${newName}) is shorter than the minium allowed length (${newName.length}).`, false, 4000)
       return //Para parar la ejecución del script
-    }else if(personObject.number.length < 8 || phoneRegex.test(newNumber)){
+    }else if(personObject.number.length < 8){
       handleMessage(`Person validation failed: number: Path "number" (${newNumber}) is shorter than the minium allowed length (${newNumber.length}).`, false, 4000)
       return //Para parar la ejecución del script
     }
