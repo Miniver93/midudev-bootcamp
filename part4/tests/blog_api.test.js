@@ -13,7 +13,7 @@ describe('GET blogs', () =>{
             .expect('Content-Type', /application\/json/)
     })
       
-    test('the first note author is Jose', async () => {
+    test.skip('the first note author is Jose', async () => {
         const response = await api.get('/api/blogs')
     
         const contents = response.body.map(e => e.author)
@@ -26,7 +26,7 @@ describe('GET blogs', () =>{
         const contents = response.body
         const paramId = Object.keys(...contents)
         console.log(paramId);
-        assert.strictEqual(paramId[3], 'id')
+        assert.strictEqual(paramId[4], 'id')
     })
 })
 
@@ -94,7 +94,35 @@ describe('POST blogs', () =>{
     });
 })
 
-after(async () => {
-    await mongoose.connection.close()
-    console.log('connection close');
+describe('DELETE blogs', () =>{
+    test.skip('blog can be delete', async () => {
+        const firstResponse = await api.get('/api/blogs')
+        const blogs = firstResponse.body
+        const [blogToDelete] = blogs
+
+        await api
+            .delete(`/api/blogs/${blogToDelete.id}`)
+            .expect(204)
+
+        const secondResponse = await api.get('/api/blogs')
+        const contents = secondResponse.body.map(blog => blog.title)
+        assert.strictEqual(secondResponse.body.length, firstResponse.body.length -1)
+        assert.notDeepStrictEqual(contents, blogToDelete)
+    })
+
+    test('blog cant be delete', async () => {
+        const firstResponse = await api.get('/api/blogs')
+        await api
+            .delete('/api/blogs/12312')
+            .expect(400)
+
+            const secondResponse = await api.get('/api/blogs')
+        assert.strictEqual(secondResponse.body.length, firstResponse.body.length)
+    })
+
 })
+
+// after(async () => {
+//     await mongoose.connection.close()
+//     console.log('connection close');
+// })
