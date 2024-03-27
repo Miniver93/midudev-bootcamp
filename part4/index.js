@@ -18,17 +18,18 @@ app.get('/api/blogs', async (request, response) =>{
 app.post('/api/blogs', async (request, response) =>{
     const blog = request.body
 
-    if(!blog.likes){
+    if (!blog || !blog.title || !blog.url) {
+        return response.status(400).json({
+            error: 'title and url properties are required'
+        });
+    }
+
+    if(!blog.likes || typeof blog.likes === 'undefined'){
         blog.likes=0
     }
 
-    if(!blog){
-        return response.status(404).json({
-            error: 'required "content" field is missing'
-        })
-    }
-
     const newBlog = new Blog({
+        title: blog.title,
         author: blog.author,
         url: blog.url,
         likes: blog.likes

@@ -33,9 +33,10 @@ describe('GET blogs', () =>{
 describe('POST blogs', () =>{
     test('sucessfully creates a new blog post', async () =>{
         const blog = { 
-                author : "Sergio",
-                url : "http://localhost:3001/api/blogs/4",
-                likes: 5
+            title: "El coche fantástico",
+            author : "Sergio",
+            url : "http://localhost:3001/api/blogs/4",
+            likes: 5
             }
         
         const firstResponse = await api.get('/api/blogs')
@@ -53,8 +54,9 @@ describe('POST blogs', () =>{
 
     test('likes property is missing it will default to the value 0', async () => {
         const blog = {
-            author: "Manolo",
-            url: "localhost"
+                title: "First class tests",
+                author: "Robert C. Martin",
+                url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll"
         }
 
         await api
@@ -62,10 +64,34 @@ describe('POST blogs', () =>{
             .send(blog)
             .expect(201)
 
-            const request = await api.post('/api/blogs')
-            const contents = request.body
-            assert.strictEqual(contents.likes, 0)
+            const response = await api.get('/api/blogs')
+            const contents = response.body
+            assert.strictEqual(contents[contents.length -1].likes, 0)
     })
+
+    test('missing title property responds with 400 Bad Request', async () => {
+        const blogWithoutTitle = {
+            author: "John Doe",
+            url: "http://example.com"
+        };
+    
+        await api
+            .post('/api/blogs')
+            .send(blogWithoutTitle)
+            .expect(400);
+    });
+    
+    test('missing url property responds with 400 Bad Request', async () => {
+        const blogWithoutUrl = {
+            title: "Example Blog",
+            author: "John Doe"
+        };
+    
+        await api
+            .post('/api/blogs')
+            .send(blogWithoutUrl)
+            .expect(400);
+    });
 })
 
 after(async () => {
