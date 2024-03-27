@@ -7,7 +7,7 @@ const api = supertest(app)
 
 describe('GET blogs', () =>{
     test('blogs are returned as json', async () =>{
-        api
+        await api
             .get('/api/blogs')
             .expect(200)
             .expect('Content-Type', /application\/json/)
@@ -36,6 +36,27 @@ describe('GET blogs', () =>{
     })
 })
 
+describe('POST blogs', () =>{
+    test('sucessfully creates a new blog post', async () =>{
+        const blog = { 
+                author : "Sergio",
+                url : "http://localhost:3001/api/blogs/4",
+                likes : 3,
+            }
+        
+        const firstResponse = await api.get('/api/blogs')
+        await api
+            .post('/api/blogs')
+            .send(blog)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+            const secondResponse = await api.get('/api/blogs')
+            const contents = secondResponse.body.map(blog => blog.author)
+            assert.strictEqual(secondResponse.body.length, firstResponse.body.length +1)
+            assert(contents.includes(blog.author))
+    })
+})
 
 after(async () => {
     await mongoose.connection.close()

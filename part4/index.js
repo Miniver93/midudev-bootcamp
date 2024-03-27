@@ -16,9 +16,21 @@ app.get('/api/blogs', async (request, response) =>{
 })
 
 app.post('/api/blogs', async (request, response) =>{
-    const blog = new Blog(request.body)
+    const blog = request.body
 
-    const result= await blog.save()
+    if(!blog){
+        return response.status(404).json({
+            error: 'required "content" field is missing'
+        })
+    }
+
+    const newBlog = new Blog({
+        author: blog.author,
+        url: blog.url,
+        likes: blog.likes
+    })
+
+    const result= await newBlog.save()
     response.status(201).json(result)
 })
 
