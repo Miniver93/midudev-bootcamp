@@ -21,8 +21,32 @@ const favoriteBlog = (blogList) => {
   }
 }
 
+
+
+const mostBlogs = (blogList) => {
+  if (blogList.length === 0) {
+    return 0
+  }else{
+    const authors = blogList.map(blog => blog.author)
+    //Verificamos si el author actual ya existe como clave en prev, si existe, aumentamos su contador en 1, si no existe, establecemos su contador en 1, devolvemos el objeto prev actualizado para la siguiente iteración o como resultado final (estos objetos se van guardando en el objeto vacio que le hemos pasado como parámetro)
+    const authorNumberBlogs = authors.reduce((prev, author ) => (prev[author] = prev[author] +1 || 1, prev), {})
+    const maxBlogs=Math.max(...Object.values(authorNumberBlogs))
+    const author=Object.keys(authorNumberBlogs).reduce((prev,current) => authorNumberBlogs[prev] < authorNumberBlogs[current] ? current : prev)
+  
+    const objectAuthor = {
+      author: author,
+      blogs: maxBlogs
+    }
+    
+    return objectAuthor
+  }
+
+}
+
+
   module.exports = {
     dummy,
     totalLikes,
-    favoriteBlog
+    favoriteBlog,
+    mostBlogs
   }
