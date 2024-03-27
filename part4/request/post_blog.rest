@@ -2,8 +2,8 @@ POST http://localhost:3001/api/blogs HTTP/1.1
 Content-Type: application/json
 
 {
-    "tittle": "Aprende a programar",
-    "author": "Jose",
-    "url": "http://localhost:3001/api/blogs/1",
-    "likes": 1
+    "tittle": "Canta con Maria",
+    "author": "Maria",
+    "url": "http://localhost:3001/api/blogs/2",
+    "likes": 2
 }
