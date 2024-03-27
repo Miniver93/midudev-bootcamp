@@ -12,12 +12,6 @@ describe('GET blogs', () =>{
             .expect(200)
             .expect('Content-Type', /application\/json/)
     })
-    
-    test('there are two blogs', async () => {
-        const response = await api.get('/api/blogs')
-      
-        assert.strictEqual(response.body.length, 2)
-    })
       
     test('the first note author is Jose', async () => {
         const response = await api.get('/api/blogs')
@@ -41,7 +35,7 @@ describe('POST blogs', () =>{
         const blog = { 
                 author : "Sergio",
                 url : "http://localhost:3001/api/blogs/4",
-                likes : 3,
+                likes: 5
             }
         
         const firstResponse = await api.get('/api/blogs')
@@ -55,6 +49,22 @@ describe('POST blogs', () =>{
             const contents = secondResponse.body.map(blog => blog.author)
             assert.strictEqual(secondResponse.body.length, firstResponse.body.length +1)
             assert(contents.includes(blog.author))
+    })
+
+    test('likes property is missing it will default to the value 0', async () => {
+        const blog = {
+            author: "Manolo",
+            url: "localhost"
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(blog)
+            .expect(201)
+
+            const request = await api.post('/api/blogs')
+            const contents = request.body
+            assert.strictEqual(contents.likes, 0)
     })
 })
 

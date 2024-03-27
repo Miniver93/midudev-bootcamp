@@ -18,6 +18,10 @@ app.get('/api/blogs', async (request, response) =>{
 app.post('/api/blogs', async (request, response) =>{
     const blog = request.body
 
+    if(!blog.likes){
+        blog.likes=0
+    }
+
     if(!blog){
         return response.status(404).json({
             error: 'required "content" field is missing'

@@ -4,6 +4,5 @@ Content-Type: application/json
 {
     "tittle": "Canta con Maria",
     "author": "Maria",
-    "url": "http://localhost:3001/api/blogs/2",
-    "likes": 2
+    "url": "http://localhost:3001/api/blogs/2"
 }
