@@ -56,12 +56,35 @@ app.delete('/api/blogs/:id', async (request, response, next) =>{
     } catch (error) {
         next(error)
     }
-    
-
-    
-
 
 })
+
+app.put('/api/blogs/:id', async (request, response, next) => {
+    const {id} = request.params
+    const blog = request.body
+
+    if(!mongoose.isValidObjectId(id)){
+        return response.status(400).send({ error: 'that is not a valid id'}).end()
+    }
+
+    const newBlog = {
+        title: blog.title,
+        author: blog.author,
+        url: blog.url,
+        likes: blog.likes
+    }
+
+    try {
+        const result = await Blog.findByIdAndUpdate(id, newBlog, { new: true })
+        response.json(result)
+    } catch (error) {
+        next(error)
+    }
+    
+
+})
+
+
 app.use(require('./middleware/notFound.js'))
 app.use(require('./middleware/handleError.js'))
 

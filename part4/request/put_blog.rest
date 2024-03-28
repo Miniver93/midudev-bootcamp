@@ -1,0 +1,8 @@
+PUT http://localhost:3001/api/blogs/66057acabfcd3c6106e8909f HTTP/1.1
+Content-Type: application/json
+
+{
+    "title": "Canta con Maria",
+    "author": "Maria",
+    "url": "http://localhost:3001/api/blogs/2"
+}

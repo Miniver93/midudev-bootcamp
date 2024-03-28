@@ -122,7 +122,27 @@ describe('DELETE blogs', () =>{
 
 })
 
-// after(async () => {
-//     await mongoose.connection.close()
-//     console.log('connection close');
-// })
+describe('PUT delete', () =>{
+    test('blog can be update', async () => {
+        const blog = {
+            title: "Canta con Maria",
+            author: "Maria",
+            url: "http://localhost:3001/api/blogs/2"
+        }
+
+
+        const response = await api
+            .put('/api/blogs/66057f9ea59809d4eff0630b')
+            .send(blog)
+            .expect('Content-Type', /application\/json/)
+            .expect(200)
+
+        assert.deepStrictEqual(response.body.title, blog.title)
+        
+    })
+})
+
+ after(async () => {
+     await mongoose.connection.close()
+     console.log('connection close');
+ })
